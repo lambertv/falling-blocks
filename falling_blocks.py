@@ -137,6 +137,7 @@ class Game:
         self.block_grid = [[None for i in range(20)] for j in range(10)]
         self.clock = pygame.time.Clock()
         self.current_piece = Piece()
+        print self.block_grid[0][19]
 
     def draw(self):
         self.screen.fill(BACKGROUND_COLOR)
@@ -158,6 +159,26 @@ class Game:
         self.clock.tick(FPS)
         if self.current_piece.update(self.playbox, self.block_grid) == -1:
             self.current_piece = Piece()
+        self.check_grid()
+
+    def check_grid(self):
+        for y in range(len(self.block_grid[0])):
+            full = True
+            for x in range(len(self.block_grid)):
+                if self.block_grid[x][y] is None:
+                    full = False
+            if full:
+                for x in range(len(self.block_grid)):
+                    self.block_grid[x][y] = None
+                self.grid_fall(y)
+
+    def grid_fall(self, height):
+        for x in range(len(self.block_grid)):
+            for y in range(height-1, -1, -1):
+                if self.block_grid[x][y] is not None:
+                    self.block_grid[x][y].y += 1
+                    self.block_grid[x][y+1] = self.block_grid[x][y]
+                    self.block_grid[x][y] = None
 
     def player_input(self):
         for event in pygame.event.get():
